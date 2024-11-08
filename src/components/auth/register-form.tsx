@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { login } from "@/actions/login";
 import { registerSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
@@ -19,6 +18,7 @@ import {
 import { Button } from "../ui/button";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
+import { register } from "@/actions/register";
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -29,6 +29,7 @@ export const RegisterForm = () => {
     resolver: zodResolver(registerSchema),
     disabled: isPending,
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
@@ -36,7 +37,7 @@ export const RegisterForm = () => {
 
   const onSubmit = (formData: z.infer<typeof registerSchema>) => {
     startTransition(() => {
-      login(formData).then((data) => {
+      register(formData).then((data) => {
         setError(data.error);
         setSuccess(data.success);
       });
