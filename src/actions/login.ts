@@ -5,6 +5,8 @@ import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { loginSchema } from "@/schemas";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { getUserByEmail } from "@/data/user";
+import { generateVerificationToken } from "@/lib/tokens";
 
 export const login = async (data: z.infer<typeof loginSchema>) => {
   const validatedFields = loginSchema.safeParse(data);
@@ -14,6 +16,18 @@ export const login = async (data: z.infer<typeof loginSchema>) => {
   }
 
   const { email, password } = validatedFields.data;
+
+  const user = await getUserByEmail(email);
+
+  if (!user || !user.email || !user.passwordHash) {
+    return { error: "Invalid credentials!" };
+  }
+
+  if (!user.emailVerified) {
+    const verificationToken = await generateVerificationToken(user.email);
+
+    return { success: "Confirmation email sent" };
+  }
 
   try {
     await signIn("credentials", {
