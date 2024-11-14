@@ -9,6 +9,7 @@ import { prisma } from "./lib/db";
 import { loginSchema } from "./schemas";
 import { getUserByEmail, getUserById } from "./data/user";
 import { env } from "./config/env";
+import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
@@ -66,7 +67,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         //Prevent sign in without email verification
         if (!existingUser?.emailVerified) return false;
 
-        //TODO: ADD 2FA CHECK
+        if (existingUser.isTwoFactorEnabled) {
+          const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+            existingUser.id,
+          );
+
+          if (!twoFactorConfirmation) return false;
+
+          // Delete two factor confirmation for next sign in
+          // Alternatively, an expiration date can be added to the token or verification by IP.
+          await prisma.twoFactorConfirmation.delete({
+            where: { id: twoFactorConfirmation.id },
+          });
+        }
       }
 
       return true;
