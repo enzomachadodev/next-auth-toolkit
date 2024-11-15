@@ -8,7 +8,6 @@ import { UserRole } from "@prisma/client";
 import { prisma } from "./lib/db";
 import { loginSchema } from "./schemas";
 import { getUserByEmail, getUserById } from "./data/user";
-import { env } from "./config/env";
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -30,12 +29,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   providers: [
     Google({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     GitHub({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
     Credentials({
       authorize: async (credentials) => {
@@ -85,12 +84,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
     async session({ token, session }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
-      }
+      if (session.user) {
+        if (token.sub) {
+          session.user.id = token.sub;
+        }
 
-      if (token.role && session.user) {
-        session.user.role = token.role as UserRole;
+        if (token.role) {
+          session.user.role = token.role as UserRole;
+        }
+
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
       }
 
       return session;
@@ -103,6 +106,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (!existingUser) return token;
 
       token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;
     },
