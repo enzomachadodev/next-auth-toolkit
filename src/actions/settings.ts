@@ -50,8 +50,8 @@ export const settings = async (data: z.infer<typeof settingsSchema>) => {
 
   if (data.password && data.newPassword && dbUser.passwordHash) {
     const passwordMatch = await bcrypt.compare(
-      dbUser.passwordHash,
       data.password,
+      dbUser.passwordHash,
     );
 
     if (!passwordMatch) {
@@ -64,9 +64,17 @@ export const settings = async (data: z.infer<typeof settingsSchema>) => {
     data.newPassword = undefined;
   }
 
+  const { email, isTwoFactorEnabled, name, password, role } = data;
+
   await prisma.user.update({
     where: { id: dbUser.id },
-    data,
+    data: {
+      name,
+      email,
+      isTwoFactorEnabled,
+      passwordHash: password,
+      role,
+    },
   });
 
   return { success: "User updated" };
