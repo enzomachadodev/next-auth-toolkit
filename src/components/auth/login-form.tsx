@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import Link from "next/link";
+
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { login } from "@/actions/login";
-import { loginSchema } from "@/schemas";
+import { useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "../ui/input";
-import { CardWrapper } from "./card-wrapper";
+
 import {
   Form,
   FormControl,
@@ -16,14 +16,17 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { login } from "@/actions/login";
+import { loginSchema } from "@/schemas";
 import { FormError } from "../form-error";
+import { CardWrapper } from "./card-wrapper";
 import { FormSuccess } from "../form-success";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email already in use with different provider!"
@@ -49,7 +52,7 @@ export const LoginForm = () => {
     setSuccess("");
 
     startTransition(() => {
-      login(formData).then((data) => {
+      login(formData, callbackUrl).then((data) => {
         if (data?.error) {
           return setError(data?.error);
         }

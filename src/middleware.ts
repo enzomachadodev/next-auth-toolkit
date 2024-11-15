@@ -26,7 +26,17 @@ export default middleware((req) => {
   }
 
   if (!isLoggedIn && !isPublicRoute) {
-    return redirectWithBaseURL("/auth/login", nextUrl);
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) {
+      callbackUrl += nextUrl.search;
+    }
+
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+
+    return redirectWithBaseURL(
+      `/auth/login?callbackUrl=${encodedCallbackUrl}`,
+      nextUrl,
+    );
   }
 
   return undefined;
