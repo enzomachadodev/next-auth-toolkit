@@ -28,12 +28,12 @@ export const settingsSchema = z
     email: z.optional(emailFieldSchema),
     role: z.optional(roleFieldSchema),
     isTwoFactorEnabled: z.optional(isTwoFactorEnabledFieldSchema),
-    oldPassword: z.optional(passwordFieldSchema),
+    password: z.optional(passwordFieldSchema),
     newPassword: z.optional(newPasswordFieldSchema),
   })
   .refine(
     (data) => {
-      if (data.oldPassword && !data.newPassword) {
+      if (data.password && !data.newPassword) {
         return false;
       }
 
@@ -46,7 +46,7 @@ export const settingsSchema = z
   )
   .refine(
     (data) => {
-      if (data.newPassword && !data.oldPassword) {
+      if (data.newPassword && !data.password) {
         return false;
       }
 
