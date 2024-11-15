@@ -51,7 +51,6 @@ export const LoginForm = () => {
     startTransition(() => {
       login(formData).then((data) => {
         if (data?.error) {
-          form.reset();
           return setError(data?.error);
         }
         if (data?.success) {
