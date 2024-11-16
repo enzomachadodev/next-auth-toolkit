@@ -75,7 +75,7 @@ export const ResetPasswordForm = () => {
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button type="submit" className="w-full" isPending={isPending}>
             Send reset email
           </Button>
         </form>
