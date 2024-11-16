@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +25,7 @@ import { FormError } from "../form-error";
 import { CardWrapper } from "./card-wrapper";
 import { FormSuccess } from "../form-success";
 import { PasswordInput } from "../ui/password-input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
@@ -84,14 +86,23 @@ export const LoginForm = () => {
                 control={form.control}
                 name="code"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="mx-auto w-fit text-center">
                     <FormLabel>Two Factor Code</FormLabel>
                     <FormControl>
-                      <Input
+                      <InputOTP
+                        maxLength={6}
+                        pattern={REGEXP_ONLY_DIGITS}
                         {...field}
-                        placeholder="123456"
-                        disabled={isPending}
-                      />
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
