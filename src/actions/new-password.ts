@@ -4,24 +4,25 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getUserByEmail } from "@/data/user";
-import { newPasswordSchema } from "@/schemas";
+import { newPasswordSchema, tokenSchema } from "@/schemas";
 import { getPasswordResetTokenByToken } from "@/data/password-reset-token";
 
 export const newPassword = async (
   data: z.infer<typeof newPasswordSchema>,
-  token?: string | null,
+  tokenValue?: string | null,
 ) => {
-  if (!token) {
+  if (!tokenValue) {
     return { error: "Missing token!" };
   }
 
-  const validatedFields = newPasswordSchema.safeParse(data);
+  const validatedToken = tokenSchema.safeParse({ token: tokenValue });
 
-  if (!validatedFields.success) {
-    return { error: "Invalid fields!" };
+  if (!validatedToken.success) {
+    console.log("PASSOU AQUIIIIIIIII", validatedToken.error.errors);
+    return { error: "Invalid token!" };
   }
 
-  const { password } = validatedFields.data;
+  const { token } = validatedToken.data;
 
   const existingToken = await getPasswordResetTokenByToken(token);
 
@@ -41,16 +42,37 @@ export const newPassword = async (
     return { error: "Email does not exist!" };
   }
 
-  const passwordHash = await bcrypt.hash(password, 7);
+  // Verify new password data
+  const validatedFields = newPasswordSchema.safeParse(data);
 
-  await prisma.user.update({
-    where: { id: existingUser.id },
-    data: { passwordHash },
-  });
+  if (!validatedFields.success) {
+    return { error: "Invalid fields!" };
+  }
 
-  await prisma.resetPasswordToken.delete({
-    where: { id: existingToken.id },
-  });
+  const { password } = validatedFields.data;
 
-  return { success: "Password updated!" };
+  const isSamePassword = await bcrypt.compare(
+    password,
+    existingUser.passwordHash || "",
+  );
+  if (isSamePassword) {
+    return { error: "New password cannot be the same as the old password!" };
+  }
+
+  try {
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: existingUser.id },
+        data: { passwordHash: await bcrypt.hash(password, 7) },
+      }),
+      prisma.resetPasswordToken.delete({
+        where: { id: existingToken.id },
+      }),
+    ]);
+
+    return { success: "Password updated successfully!" };
+  } catch (error) {
+    console.error("Error updating password:", error);
+    return { error: "An error occurred while updating the password." };
+  }
 };

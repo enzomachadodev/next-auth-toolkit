@@ -1,81 +1,44 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-
 import { z } from "zod";
 
 import { prisma } from "@/lib/db";
-import { currentUser } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth";
 import { settingsSchema } from "@/schemas";
-import { sendVerificationEmail } from "@/lib/mail";
-import { generateVerificationToken } from "@/lib/tokens";
-import { getUserByEmail, getUserById } from "@/data/user";
 
 export const settings = async (data: z.infer<typeof settingsSchema>) => {
-  const user = await currentUser();
+  const user = await getAuthenticatedUser();
 
-  if (!user) {
-    return { error: "Unauthorized" };
+  if (!user) return { error: "Unauthorized!" };
+
+  const validatedFields = settingsSchema.safeParse(data);
+
+  if (!validatedFields.success) return { error: "Invalid fields!" };
+
+  const { name, isTwoFactorEnabled, role } = validatedFields.data;
+
+  const updateData: Record<string, string | boolean> = {};
+
+  if (name) {
+    updateData.name = name;
   }
 
-  const dbUser = await getUserById(user.id);
-
-  if (!dbUser) {
-    return { error: "Unauthorized" };
+  if (typeof isTwoFactorEnabled !== "undefined" && !user.isOAuth) {
+    updateData.isTwoFactorEnabled = isTwoFactorEnabled;
   }
 
-  if (user.isOAuth) {
-    data.email = undefined;
-    data.password = undefined;
-    data.newPassword = undefined;
-    data.isTwoFactorEnabled = undefined;
+  if (role) {
+    updateData.role = role;
   }
 
-  if (data.email && data.email !== user.email) {
-    const existingUser = await getUserByEmail(data.email);
-
-    if (existingUser && existingUser.id !== user.id) {
-      return { error: "Email already in use!" };
-    }
-
-    const verificationToken = await generateVerificationToken(data.email);
-
-    await sendVerificationEmail(
-      verificationToken.email,
-      verificationToken.token,
-    );
-
-    return { success: "Verification email sent!" };
+  if (Object.keys(updateData).length === 0) {
+    return { error: "No changes to update." };
   }
-
-  if (data.password && data.newPassword && dbUser.passwordHash) {
-    const passwordMatch = await bcrypt.compare(
-      data.password,
-      dbUser.passwordHash,
-    );
-
-    if (!passwordMatch) {
-      return { error: "Incorrect password!" };
-    }
-
-    const hashedPassowrd = await bcrypt.hash(data.password, 7);
-
-    data.password = hashedPassowrd;
-    data.newPassword = undefined;
-  }
-
-  const { email, isTwoFactorEnabled, name, password, role } = data;
 
   await prisma.user.update({
-    where: { id: dbUser.id },
-    data: {
-      name,
-      email,
-      isTwoFactorEnabled,
-      passwordHash: password,
-      role,
-    },
+    where: { id: user.id },
+    data: updateData,
   });
 
-  return { success: "User updated" };
+  return { success: "Settings updated!" };
 };

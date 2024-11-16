@@ -22,41 +22,41 @@ const isTwoFactorEnabledFieldSchema = z.boolean();
 
 const roleFieldSchema = z.enum([UserRole.ADMIN, UserRole.USER]);
 
-export const settingsSchema = z
-  .object({
-    name: z.optional(nameFieldSchema),
-    email: z.optional(emailFieldSchema),
-    role: z.optional(roleFieldSchema),
-    isTwoFactorEnabled: z.optional(isTwoFactorEnabledFieldSchema),
-    password: z.optional(passwordFieldSchema),
-    newPassword: z.optional(newPasswordFieldSchema),
-  })
-  .refine(
-    (data) => {
-      if (data.password && !data.newPassword) {
-        return false;
-      }
+export const settingsSchema = z.object({
+  name: z.optional(z.string()),
+  role: z.optional(roleFieldSchema),
+  isTwoFactorEnabled: z.optional(isTwoFactorEnabledFieldSchema),
+});
 
-      return true;
-    },
-    {
-      message: "New passwrod is required!",
-      path: ["newPassword"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.newPassword && !data.password) {
-        return false;
-      }
+export const tokenSchema = z.object({
+  token: z.string().uuid(),
+});
+// .refine(
+//   (data) => {
+//     if (data.password && !data.newPassword) {
+//       return false;
+//     }
 
-      return true;
-    },
-    {
-      message: "Passwrod is required!",
-      path: ["password"],
-    },
-  );
+//     return true;
+//   },
+//   {
+//     message: "New passwrod is required!",
+//     path: ["newPassword"],
+//   },
+// )
+// .refine(
+//   (data) => {
+//     if (data.newPassword && !data.password) {
+//       return false;
+//     }
+
+//     return true;
+//   },
+//   {
+//     message: "Passwrod is required!",
+//     path: ["password"],
+//   },
+// );
 
 export const newPasswordSchema = z.object({
   password: newPasswordFieldSchema,

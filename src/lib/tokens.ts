@@ -60,15 +60,9 @@ export const generateResetPasswordToken = async (
     });
   }
 
-  const passwordResetToken = await prisma.resetPasswordToken.create({
-    data: {
-      email,
-      expires,
-      token,
-    },
+  return prisma.resetPasswordToken.create({
+    data: { email, expires, token },
   });
-
-  return passwordResetToken;
 };
 
 export const generateVerificationToken = async (

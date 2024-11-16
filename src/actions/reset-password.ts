@@ -12,27 +12,26 @@ export const resetPassword = async (
   const validatedFields = resetPasswordSchema.safeParse(data);
 
   if (!validatedFields.success) {
-    return {
-      error: "Invalid email!",
-    };
+    return { error: "Invalid email format!" };
   }
 
   const { email } = validatedFields.data;
-
   const existingUser = await getUserByEmail(email);
 
   if (!existingUser) {
-    return { error: "Email not found!" };
+    return { success: "If the email exists, a reset link has been sent." };
   }
 
-  const passwordResetToken = await generateResetPasswordToken(email);
+  try {
+    const passwordResetToken = await generateResetPasswordToken(email);
+    await sendPasswordResetEmail(
+      passwordResetToken.email,
+      passwordResetToken.token,
+    );
 
-  await sendPasswordResetEmail(
-    passwordResetToken.email,
-    passwordResetToken.token,
-  );
-
-  return {
-    success: "Reset password email has been sent!",
-  };
+    return { success: "Reset password email has been sent!" };
+  } catch (error) {
+    console.error("Error generating password reset:", error);
+    return { error: "An error occurred while processing your request." };
+  }
 };
