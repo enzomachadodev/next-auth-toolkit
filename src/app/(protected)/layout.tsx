@@ -7,7 +7,7 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <SessionProvider session={session}>
-      <div className="bg-blue-gradient flex h-full w-full flex-col items-center justify-center gap-y-10">
+      <div className="bg-blue-gradient flex min-h-screen w-full flex-col items-center justify-center gap-y-10 p-4">
         <NavBar />
         {children}
       </div>

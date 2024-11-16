@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { registerSchema } from "@/schemas";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "../ui/input";
-import { CardWrapper } from "./card-wrapper";
 import {
   Form,
   FormControl,
@@ -15,10 +12,14 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { FormError } from "../form-error";
-import { FormSuccess } from "../form-success";
+import { registerSchema } from "@/schemas";
+import { CardWrapper } from "./card-wrapper";
 import { register } from "@/actions/register";
+import { FormSuccess } from "../form-success";
+import { PasswordInput } from "../ui/password-input";
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -96,10 +97,9 @@ export const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
+                    <PasswordInput
                       {...field}
                       placeholder="******"
-                      type="password"
                       disabled={isPending}
                     />
                   </FormControl>
