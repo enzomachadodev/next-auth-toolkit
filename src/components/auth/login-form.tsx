@@ -23,6 +23,7 @@ import { loginSchema } from "@/schemas";
 import { FormError } from "../form-error";
 import { CardWrapper } from "./card-wrapper";
 import { FormSuccess } from "../form-success";
+import { PasswordInput } from "../ui/password-input";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
@@ -125,10 +126,9 @@ export const LoginForm = () => {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input
+                        <PasswordInput
                           {...field}
                           placeholder="******"
-                          type="password"
                           disabled={isPending}
                         />
                       </FormControl>

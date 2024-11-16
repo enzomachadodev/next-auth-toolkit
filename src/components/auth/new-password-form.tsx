@@ -18,8 +18,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 import { newPassword } from "@/actions/new-password";
+import { PasswordInput } from "../ui/password-input";
 
 export const NewPasswordForm = () => {
   const searchParams = useSearchParams();
@@ -62,11 +62,10 @@ export const NewPasswordForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
+                    <PasswordInput
                       {...field}
                       disabled={isPending}
                       placeholder="******"
-                      type="password"
                     />
                   </FormControl>
                   <FormMessage />
