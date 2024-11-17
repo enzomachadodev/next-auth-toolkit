@@ -48,17 +48,11 @@ export const login = async (
     if (code) {
       const twoFactorToken = await getTwoFactorTokenByEmail(user.email);
 
-      if (!twoFactorToken) {
+      if (!twoFactorToken || twoFactorToken.token !== code) {
         return { error: "Invalid code!" };
       }
 
-      if (twoFactorToken.token !== code) {
-        return { error: "Invalid code!" };
-      }
-
-      const hasExipired = new Date(twoFactorToken.expires) < new Date();
-
-      if (hasExipired) {
+      if (new Date(twoFactorToken.expires) < new Date()) {
         return { error: "Code expired!" };
       }
 

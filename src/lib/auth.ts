@@ -1,4 +1,4 @@
-import { ExtendedUser } from "@/@types/next-auth";
+import { ExtendedUser } from "@/types/next-auth";
 import { auth } from "@/auth";
 import { getUserById } from "@/data/user";
 import { UserRole } from "@prisma/client";
