@@ -1,0 +1,9 @@
+services:
+  postgres:
+    container_name: dev_database
+    image: postgres
+    environment:
+      - POSTGRES_USER=enzomachadodev
+      - POSTGRES_PASSWORD=enzomachadodev
+    ports:
+      - 5432:5432
