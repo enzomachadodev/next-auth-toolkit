@@ -1,6 +1,6 @@
 # **🌟 Auth Manager - Authentication Toolkit with Next.js and Auth.js**
 
-![Project Image](https://github.com/enzomachado/PROJECT_NAME/blob/main/public/thumbnail.png)
+![Project Image](https://github.com/enzomachado/auth-manager/blob/master/public/preview.png)
 
 ## 📋 <a name="table">Table of Contents</a>
 
