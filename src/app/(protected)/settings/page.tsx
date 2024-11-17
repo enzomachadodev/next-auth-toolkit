@@ -11,9 +11,9 @@ import { updatePassword } from "@/actions/update-password";
 import { toast } from "sonner";
 
 const SettingsPage = () => {
-  const [isPending, startTransition] = useTransition();
-
   const user = useCurrentUser();
+
+  const [isPending, startTransition] = useTransition();
 
   const handleUpdatePassword = () => {
     startTransition(() => {
