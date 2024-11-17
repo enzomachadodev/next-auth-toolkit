@@ -4,7 +4,7 @@ import * as React from "react";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { LuMinus } from "react-icons/lu";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,

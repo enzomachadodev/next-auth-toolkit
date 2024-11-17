@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Input, InputProps } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 type PasswordInputProps = InputProps;
 
