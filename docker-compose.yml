@@ -1,9 +1,11 @@
 services:
   postgres:
-    container_name: dev_database
     image: postgres
+    container_name: auth-toolkit-pg
+    restart: "no"
     environment:
-      - POSTGRES_USER=enzomachadodev
-      - POSTGRES_PASSWORD=enzomachadodev
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: authtoolkit
     ports:
       - 5432:5432

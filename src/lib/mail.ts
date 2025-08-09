@@ -60,6 +60,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   });
 
   if (error) {
-    return console.log("RESEND ERROR:", error);
+    console.error("RESEND ERROR:", error);
+    return { error: "Email delivery failed." };
   }
 };
